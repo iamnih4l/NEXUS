@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NexusGo | Food Spoilage Detection</title>
+  <style>
+    body {
+      margin:0;
+      font-family: Arial;
+      background:#f3f3f3;
+    }
+    header {
+      background:#131921;
+      color:white;
+      padding:16px 30px;
+      font-size:22px;
+    }
+    .container {
+      padding:30px;
+      max-width:600px;
+      margin:auto;
+    }
+    .card {
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+    button {
+      background:#febd69;
+      border:none;
+      padding:12px;
+      font-weight:bold;
+      cursor:pointer;
+      width:100%;
+      margin-top:10px;
+    }
+    #result {
+      margin-top:20px;
+      padding:15px;
+      border-radius:8px;
+      background:#f7f7f7;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>NexusGo — Food Spoilage Detection</header>
+
+<div class="container">
+  <div class="card">
+    <h3>Upload Food Image</h3>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="detect()">Analyze Image</button>
+
+    <div id="result"></div>
+  </div>
+</div>
+
+<script>
+async function detect() {
+  const fileInput = document.getElementById("imageInput");
+  if (!fileInput.files.length) {
+    alert("Please upload an image.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  const resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "Analyzing image...";
+
+  try {
+    const res = await fetch("http://127.0.0.1:8001/detect_spoilage", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    resultDiv.innerHTML = `
+      <strong>Spoilage Status:</strong> ${data.status}<br>
+      <strong>Confidence:</strong> ${data.confidence}<br><br>
+      ${data.explanation}
+    `;
+  } catch (err) {
+    resultDiv.innerHTML = "Error detecting spoilage.";
+  }
+}
+</script>
+
+</body>
+</html>

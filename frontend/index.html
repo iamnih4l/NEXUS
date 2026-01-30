@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NexusGo Dashboard</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#f3f3f3; }
+    header { background:#131921; color:white; padding:16px 30px; font-size:22px; }
+    .container { padding:30px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+    .card { background:white; padding:18px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+    button { background:#febd69; border:none; padding:12px; width:100%; font-weight:bold; cursor:pointer; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { padding:10px; border-bottom:1px solid #ddd; }
+    th { background:#f7f7f7; }
+    .log { max-height:200px; overflow-y:auto; font-size:14px; }
+  </style>
+</head>
+
+<body>
+<header>NexusGo — Decision Intelligence Dashboard</header>
+
+<div class="container">
+
+  <div class="grid">
+    <div class="card">
+      <h3>Total Resources</h3>
+      <div id="totalResources" style="font-size:30px;font-weight:bold">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Total NGOs</h3>
+      <div id="totalNGOs" style="font-size:30px;font-weight:bold">0</div>
+    </div>
+
+    <div class="card">
+      <h3>Actions</h3>
+      <button onclick="allocate()">Allocate All Resources</button><br><br>
+      <button onclick="location.href='add_resources.html'">Add Resources</button><br><br>
+      <button onclick="location.href='add_ngo.html'">Add NGOs</button><br><br>
+      <button onclick="location.href='opencv.html'">OpenCV Module</button><br><br>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="card">
+  <h3>Resources</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Quantity</th>
+        <th>Perishability</th>
+        <th>Uncertainty</th>
+      </tr>
+    </thead>
+    <tbody id="resources"></tbody>
+  </table>
+</div>
+
+
+  <br>
+
+  <div class="card">
+  <h3>NGOs (Trust & Location)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Trust</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+      </tr>
+    </thead>
+    <tbody id="ngos"></tbody>
+  </table>
+</div>
+
+
+  <br>
+
+  <div class="card">
+    <h3>Allocation Log</h3>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="card">
+    <h3>Reward Dashboard</h3>
+    <table>
+      <thead>
+        <tr><th>NGO</th><th>Trust</th><th>Streak</th><th>XP</th><th>Level</th><th>Total Allocations</th></tr>
+      </thead>
+      <tbody id="rewards"></tbody>
+    </table>
+  </div>
+  <!-- ... existing container content ... -->
+
+<div class="card">
+  <h3>Agentic AI Analysis</h3>
+  <div id="aiOutput"></div>
+</div>
+
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+async function allocateResources() {
+  try {
+    const res = await fetch(API + "/allocate", { method: "POST" });
+    const data = await res.json();
+    console.log(data); // optional: see response in console
+    // Reload the dashboard data after allocation
+    load();
+    loadAIAnalysis(); // if you have AI analysis
+    alert("Resources allocated successfully!"); // optional popup
+  } catch (err) {
+    console.error("Allocation failed:", err);
+    alert("Failed to allocate resources. Check backend.");
+  }
+}
+async function load() {
+  const r = await fetch(API+"/resources").then(r=>r.json());
+  const n = await fetch(API+"/ngos").then(r=>r.json());
+  const l = await fetch(API+"/allocation_log").then(r=>r.json());
+  const rew = await fetch(API+"/rewards").then(r=>r.json());
+
+  totalResources.innerText = r.length;
+  totalNGOs.innerText = n.length;
+
+  resources.innerHTML = r.map(x=>`
+  <tr>
+    <td>${x.name}</td>
+    <td>${x.food_type}</td>
+    <td>${x.quantity}</td>
+    <td>${x.perishability}</td>
+    <td>${x.uncertainty}</td>
+  </tr>
+`).join("");
+
+  ngos.innerHTML = n.map(x=>`
+  <tr>
+    <td>${x.name}</td>
+    <td>${x.trust.toFixed(2)}</td>
+    <td>${x.lat}</td>
+    <td>${x.lon}</td>
+  </tr>
+`).join("");
+
+
+  log.innerHTML = l.map(x => {
+    return `<div>
+        Resource: ${x.resource_name} → 
+        To: ${x.receiver} | 
+        Qty: ${x.quantity} | 
+        Decision: ${x.decision} | 
+        Date: ${x.allocation_date}
+    </div>`;
+}).join("");
+
+  rewards.innerHTML = rew.map(x=> {
+    const maxXP = x.level * 100;
+    const xpPercent = Math.min(100, (x.xp / maxXP) * 100);
+    const impactPercent = Math.min(100, x.total_allocations * 5);
+
+    return `
+      <tr>
+        <td>${x.ngo}</td>
+        <td>${x.trust.toFixed(2)}</td>
+        <td>${x.streak}</td>
+        <td>
+          ${x.xp} / ${maxXP}
+          <div style="background:#ddd; border-radius:6px; height:8px; overflow:hidden; margin-top:4px;">
+            <div style="background:linear-gradient(90deg,#f90,#ffb347); width:${xpPercent}%; height:100%; transition:width 0.5s;"></div>
+          </div>
+        </td>
+        <td>${x.level}</td>
+        <td>
+          ${x.total_allocations}
+          <div style="background:#ddd; border-radius:6px; height:8px; overflow:hidden; margin-top:4px;">
+            <div style="background:linear-gradient(90deg,#0073e6,#00a8ff); width:${impactPercent}%; height:100%; transition:width 0.5s;"></div>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+async function allocate() {
+  await fetch(API+"/allocate",{method:"POST"});
+  load();
+}
+<!-- ... existing container content ... -->
+
+// Example: function to display AI output
+function displayAIOutput(text) {
+  const outputDiv = document.getElementById("aiOutput");
+  const entry = document.createElement("div");
+  entry.innerText = text;
+  outputDiv.appendChild(entry);
+  outputDiv.scrollTop = outputDiv.scrollHeight; // auto-scroll
+}
+
+// Example usage
+// displayAIOutput("AI decided to allocate 3 Apples to Food For All NGO.");
+async function loadAIAnalysis() {
+  const res = await fetch(API + "/agentic_analysis");
+  const data = await res.json(); // this is a list of {text, color} objects
+
+  const aiDiv = document.getElementById("aiOutput");
+  aiDiv.innerHTML = ""; // clear previous output
+
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.innerText = item.text;     // use text, not item itself
+    div.style.background = item.color;
+    div.style.color = "#fff";
+    div.style.padding = "8px 12px";
+    div.style.marginBottom = "6px";
+    div.style.borderRadius = "6px";
+    div.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+    aiDiv.appendChild(div);
+  });
+}
+
+
+// Call after other loads
+loadAIAnalysis();
+
+// Also call after allocations to update AI reasoning
+async function allocate() {
+  await fetch(API + "/allocate", { method: "POST" });
+  load();
+  loadAIAnalysis();
+}
+
+
+// Call it after other loads
+loadAIAnalysis();
+
+
+load();
+</script>
+
+</body>
+</html>

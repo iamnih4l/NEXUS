@@ -1,0 +1,18 @@
+# Python virtual environments
+venv/
+spoilage_env/
+.venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# ML / large files
+*.pt
+*.h5
+*.pkl
+logs/
+outputs/
+.env

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Resource — NexusGo</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#f3f3f3; }
+    header { background:#131921; color:white; padding:16px 30px; font-size:22px; }
+    .container { padding:30px; max-width:500px; margin:auto; }
+    .card { background:white; padding:25px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px; }
+    button { background:#febd69; border:none; padding:12px; width:100%; font-weight:bold; cursor:pointer; border-radius:6px; margin-top:12px; }
+    h3 { margin-bottom:15px; }
+  </style>
+</head>
+
+<body>
+<header>NexusGo — Add Resource</header>
+<div class="container">
+  <div class="card">
+    <h3>Add New Resource</h3>
+
+    <label>Name:</label>
+    <input type="text" id="resName" placeholder="E.g., Milk">
+
+    <label>Type:</label>
+    <input type="text" id="resType" placeholder="E.g., Dairy">
+
+    <label>Quantity:</label>
+    <input type="number" id="resQty" placeholder="E.g., 10">
+
+    <label>Perishability (0-1):</label>
+    <input type="number" step="0.01" id="resPerish" placeholder="E.g., 0.85">
+
+    <label>Uncertainty (0-1):</label>
+    <input type="number" step="0.01" id="resUncert" placeholder="E.g., 0.15">
+
+    <button onclick="addResource()">Add Resource</button>
+  </div>
+</div>
+
+<script>
+async function addResource() {
+  const data = {
+    name: document.getElementById("resName").value,
+    food_type: document.getElementById("resType").value,
+    quantity: parseInt(document.getElementById("resQty").value),
+    perishability: parseFloat(document.getElementById("resPerish").value),
+    uncertainty: parseFloat(document.getElementById("resUncert").value)
+  };
+
+  const res = await fetch("http://127.0.0.1:8000/add_resource", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) alert("Resource added!");
+  else alert("Error adding resource.");
+}
+</script>
+</body>
+</html>

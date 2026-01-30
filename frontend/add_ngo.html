@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add NGO — NexusGo</title>
+  <style>
+    body { margin:0; font-family:Arial; background:#f3f3f3; }
+    header { background:#131921; color:white; padding:16px 30px; font-size:22px; }
+    .container { padding:30px; max-width:500px; margin:auto; }
+    .card { background:white; padding:25px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,.08); }
+    input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px; }
+    button { background:#febd69; border:none; padding:12px; width:100%; font-weight:bold; cursor:pointer; border-radius:6px; margin-top:12px; }
+    h3 { margin-bottom:15px; }
+  </style>
+</head>
+
+<body>
+<header>NexusGo — Add NGO</header>
+<div class="container">
+  <div class="card">
+    <h3>Add New NGO</h3>
+
+    <label>Name:</label>
+    <input type="text" id="ngoName" placeholder="E.g., Helping Hands">
+
+    <label>Trust (0-5):</label>
+    <input type="number" step="0.1" id="ngoTrust" placeholder="E.g., 4.2">
+
+    <label>Capacity:</label>
+    <input type="number" id="ngoCap" placeholder="E.g., 10">
+
+    <label>Latitude:</label>
+    <input type="number" step="0.0001" id="ngoLat" placeholder="E.g., 12.91">
+
+    <label>Longitude:</label>
+    <input type="number" step="0.0001" id="ngoLon" placeholder="E.g., 74.85">
+
+    <button onclick="addNGO()">Add NGO</button>
+  </div>
+</div>
+
+<script>
+async function addNGO() {
+  const data = {
+    name: document.getElementById("ngoName").value,
+    trust: parseFloat(document.getElementById("ngoTrust").value),
+    capacity: parseInt(document.getElementById("ngoCap").value),
+    latitude: parseFloat(document.getElementById("ngoLat").value),
+    longitude: parseFloat(document.getElementById("ngoLon").value)
+  };
+
+  const res = await fetch("http://127.0.0.1:8000/add_ngo", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) alert("NGO added!");
+  else alert("Error adding NGO.");
+}
+</script>
+</body>
+</html>
