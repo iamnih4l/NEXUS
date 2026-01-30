@@ -26,11 +26,16 @@
       <h3>Total Resources</h3>
       <div id="totalResources" style="font-size:30px;font-weight:bold">0</div>
     </div>
+    
 
     <div class="card">
       <h3>Total NGOs</h3>
       <div id="totalNGOs" style="font-size:30px;font-weight:bold">0</div>
     </div>
+<section class="card">
+  <h2>🚨 Priority Alerts</h2>
+  <div id="priorityAlerts">Loading alerts...</div>
+</section>
 
     <div class="card">
       <h3>Actions</h3>
@@ -103,6 +108,38 @@
 
 
 </div>
+<script>
+async function loadPriorityAlerts() {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/priority_alerts");
+    const alerts = await res.json();
+
+    const container = document.getElementById("priorityAlerts");
+    container.innerHTML = "";
+
+    if (alerts.length === 0) {
+      container.innerHTML = "<p>No active priority alerts.</p>";
+      return;
+    }
+
+    alerts.forEach(alert => {
+      const div = document.createElement("div");
+      div.className = "alert-box";
+      div.innerHTML = `
+        <strong>${alert.title}</strong>
+        <p>${alert.message}</p>
+        <small>Severity: <b>${alert.severity}</b> | ${alert.created_at}</small>
+      `;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    document.getElementById("priorityAlerts").innerText =
+      "Unable to load priority alerts.";
+  }
+}
+
+loadPriorityAlerts();
+</script>
 
 <script>
 const API = "http://127.0.0.1:8000";

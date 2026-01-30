@@ -5,6 +5,10 @@ import sqlite3
 from datetime import date, timedelta
 import math
 import random
+from typing import List
+from pydantic import BaseModel
+from datetime import datetime
+
 
 # =============================
 # APP SETUP
@@ -17,6 +21,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Priority alert structure
+class PriorityAlert(BaseModel):
+    message: str
+    level: str  # 'urgent', 'warning', 'info'
+    timestamp: str
+
+# In-memory storage for priority messages
+priority_alerts: List[PriorityAlert] = []
 
 # =============================
 # DATABASE CONNECTION
@@ -134,6 +147,29 @@ prepopulate()
 # =============================
 # MODELS
 # =============================
+class PriorityAlert(BaseModel):
+    id: int
+    title: str
+    message: str
+    severity: str  # LOW | MEDIUM | HIGH | CRITICAL
+    created_at: str
+priority_alerts: List[PriorityAlert] = [
+    PriorityAlert(
+        id=1,
+        title="Flood Emergency – Coastal Region",
+        message="Severe flooding reported. Food redistribution to affected zones is prioritized.",
+        severity="CRITICAL",
+        created_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    ),
+    PriorityAlert(
+        id=2,
+        title="Heatwave Alert",
+        message="Extreme temperatures expected. Perishable food must be allocated urgently.",
+        severity="HIGH",
+        created_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    )
+]
+
 class Resource(BaseModel):
     name: str
     food_type: str
@@ -196,6 +232,29 @@ def update_rewards(ngo_name, qty):
 # =============================
 
 # --- Add Resource ---
+@app.get("/priority_alerts")
+def get_priority_alerts():
+    return priority_alerts
+
+class PriorityAlertCreate(BaseModel):
+    title: str
+    message: str
+    severity: str
+
+
+@app.post("/priority_alerts")
+def create_priority_alert(alert: PriorityAlertCreate):
+    new_alert = PriorityAlert(
+        id=len(priority_alerts) + 1,
+        title=alert.title,
+        message=alert.message,
+        severity=alert.severity.upper(),
+        created_at=datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    priority_alerts.insert(0, new_alert)  # newest first
+    return {"status": "alert_created", "alert": new_alert}
+
+
 @app.post("/add_resource")
 def add_resource(res: Resource):
     c.execute("INSERT INTO resources (name, food_type, quantity, perishability, uncertainty) VALUES (?, ?, ?, ?, ?)",

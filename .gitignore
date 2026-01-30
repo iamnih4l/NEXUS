@@ -5,14 +5,16 @@ spoilage_env/
 env/
 ENV/
 
-# Python cache
-__pycache__/
-*.pyc
-
 # ML / large files
 *.pt
 *.h5
 *.pkl
+
+# Logs and outputs
 logs/
 outputs/
+__pycache__/
+*.pyc
+
+# Environment variables
 .env
