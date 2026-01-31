@@ -117,7 +117,8 @@ cd vision
 python spoilage_detection.py
 ```
 ---
-## Demo Link :  https://drive.google.com/file/d/1TY3BbFbmcah69i7jvLhzaphLuDYb7Rqz/view?usp=drive_link
+## Demo Link :  
+- https://drive.google.com/file/d/1TY3BbFbmcah69i7jvLhzaphLuDYb7Rqz/view?usp=drive_link
 
 
 ---
