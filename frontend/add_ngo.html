@@ -48,7 +48,7 @@ async function addNGO() {
     longitude: parseFloat(document.getElementById("ngoLon").value)
   };
 
-  const res = await fetch("http://127.0.0.1:8000/add_ngo", {
+  const res = await fetch("https://nexusgo-sj4n.onrender.com", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify(data)
