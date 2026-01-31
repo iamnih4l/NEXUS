@@ -25,10 +25,7 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    return {
-        "status": "NexusGo backend running",
-        "message": "Decision Intelligence API is live"
-    }
+    return {"status": "NexusGo backend running"}
 
 # Priority alert structure
 class PriorityAlert(BaseModel):
