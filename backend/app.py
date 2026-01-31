@@ -17,10 +17,18 @@ app = FastAPI(title="NexusGo Backend – Trust & Risk Aware Allocation")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Later restrict
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def root():
+    return {
+        "status": "NexusGo backend running",
+        "message": "Decision Intelligence API is live"
+    }
 
 # Priority alert structure
 class PriorityAlert(BaseModel):
