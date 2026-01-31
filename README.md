@@ -33,6 +33,8 @@ To enhance food safety, NexusGo integrates an OpenCV-based food spoilage detecti
 - **Computer vision integration:** OpenCV-based food spoilage detection to assess freshness and risk.
 - **Streak-based donor rewards:** Gamified incentives that encourage consistent food donation behavior.
 - **Adaptive reallocation:** Automatic reassignment when delays, failures, or uncertainty arise.
+- **Agentic AI:** AI that transparently explains and justifies resource allocations to NGOs .
+
 
 ---
 
@@ -78,7 +80,8 @@ To enhance food safety, NexusGo integrates an OpenCV-based food spoilage detecti
 - Donors upload surplus food details and images  
 - NGOs receive real-time allocation requests  
 - The system dynamically assigns, prioritizes, and reroutes food  
-- Donors earn streaks and rewards for consistent contributions  
+- Donors earn streaks and rewards for consistent contributions
+- AI explains and justifies resource allocations to NGOs usingdata-driven reasoning and logical decision
 
 **Real-World Impact:**  
 - Reduced food waste  
